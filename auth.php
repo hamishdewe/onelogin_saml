@@ -79,6 +79,22 @@ class auth_plugin_onelogin_saml extends auth_plugin_base {
     }
 
     /**
+     * Return a single identity provider to display on the login page.
+     *
+     * @param string|moodle_url $wantsurl The requested URL.
+     * @return array List of arrays with keys url, iconurl and name.
+     */
+    public function loginpage_idp_list($wantsurl) {
+        if (!$this->config->dual_login) {
+            // OneLogin is the only allowed authentication method
+            return [];
+        }
+
+        $name = empty($this->config->idp_button) ? get_string('auth_onelogin_saml_idp_button_default', 'auth_onelogin_saml') : $this->config->idp_button;
+        return [['url' => new moodle_url('/auth/onelogin_saml/index.php'), 'iconurl' => null, 'name' => $name]];
+    }
+
+    /**
     * Returns true if the username and password work and false if they are
     * wrong or don't exist.
     *
@@ -256,6 +272,10 @@ class auth_plugin_onelogin_saml extends auth_plugin_base {
 
     public function loginpage_hook() {
         global $CFG;
+
+        if ($this->config->dual_login) {
+          return;
+        }
         // Prevent username from being shown on login page after logout
         $CFG->nolastloggedin = true;
 

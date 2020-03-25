@@ -24,6 +24,11 @@ $string['auth_onelogin_saml_x509certificate_description'] = 'Public x509 certifi
 
 $string['auth_onelogin_saml_options'] = "Options";
 $string['auth_onelogin_saml_options_head'] = "In this section the behavior of the plugin is set.";
+$string['auth_onelogin_saml_dual_login'] = "Display in IDP list";
+$string['auth_onelogin_saml_dual_login_description'] = "Add a button to the login page instead of intercepting all login requests.";
+$string['auth_onelogin_saml_idp_button'] = "IDP list button text";
+$string['auth_onelogin_saml_idp_button_description'] = "The text to display on the IDP button.";
+$string['auth_onelogin_saml_idp_button_default'] = "Login via OneLogin";
 $string['auth_onelogin_saml_auto_create_users'] = 'Create user if not exists';
 $string['auth_onelogin_saml_auto_create_users_description'] = 'Auto-provisioning. If user not exists, Moodle will create a new user with the data provided by the IdP. Review the Mapping section.<br />By default, the accounts are created without a password, and the user must login via SAML identity verification.';
 $string['auth_onelogin_saml_auto_update_users'] = 'Update user data';

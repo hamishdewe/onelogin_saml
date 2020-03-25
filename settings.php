@@ -1,8 +1,8 @@
 <?php
 /* * * * * * * * * *  The OneLogin SAML authentication module for Moodle  * * * * * * * * *
- * 
+ *
  * settings.php - code for reconfiguring this module from within the Admin's GUI
- * 
+ *
  * @originalauthor OneLogin, Inc
  * @author Harrison Horowitz, Sixto Martin
  * @version 2.8.0
@@ -11,24 +11,24 @@
  * @requires XMLSecLibs v3.0.4
  * @requires php-saml v3.3.1
  * @copyright 2011-2019 OneLogin.com
- * 
- * @description 
+ *
+ * @description
  * Connects to Moodle, builds the configuration, discovers SAML status, and handles the login process accordingly.
- * 
- * Security Assertion Markup Language (SAML) is a standard for logging users into applications based 
- * on their session in another context. This has significant advantages over logging in using a 
- * username/password: no need to type in credentials, no need to remember and renew password, no weak 
+ *
+ * Security Assertion Markup Language (SAML) is a standard for logging users into applications based
+ * on their session in another context. This has significant advantages over logging in using a
+ * username/password: no need to type in credentials, no need to remember and renew password, no weak
  * passwords etc.
- * 
- * Most companies already know the identity of users because they are logged into their Active Directory 
- * domain or intranet. It is natural to use this information to log users into other applications as well 
+ *
+ * Most companies already know the identity of users because they are logged into their Active Directory
+ * domain or intranet. It is natural to use this information to log users into other applications as well
  * such as web-based application, and one of the more elegant ways of doing this by using SAML.
- * 
- * SAML is very powerful and flexible, but the specification can be quite a handful. Now OneLogin is 
- * releasing this SAML toolkit for your Moodle application to enable you to integrate SAML in seconds 
- * instead of months. We’ve filtered the signal from the noise and come up with a simple setup that will 
+ *
+ * SAML is very powerful and flexible, but the specification can be quite a handful. Now OneLogin is
+ * releasing this SAML toolkit for your Moodle application to enable you to integrate SAML in seconds
+ * instead of months. We’ve filtered the signal from the noise and come up with a simple setup that will
  * work for most applications out there.
- * 
+ *
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -88,7 +88,22 @@ if ($ADMIN->fulltree) {
             new lang_string('auth_onelogin_saml_options_head', 'auth_onelogin_saml')
         )
     );
-            
+
+    $name = 'auth_onelogin_saml/dual_login';
+    $title = get_string('auth_onelogin_saml_dual_login', 'auth_onelogin_saml');
+    $description = get_string('auth_onelogin_saml_dual_login_description', 'auth_onelogin_saml');
+    $default = false;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
+    $settings->add($setting);
+
+    $name = 'auth_onelogin_saml/idp_button';
+    $title = get_string('auth_onelogin_saml_idp_button', 'auth_onelogin_saml');
+    $description = get_string('auth_onelogin_saml_idp_button_description', 'auth_onelogin_saml');
+    $default = get_string('auth_onelogin_saml_idp_button_default', 'auth_onelogin_saml');
+    $setting = new admin_setting_configtext($name, $title, $description, $default, PARAM_TEXT);
+
+    $settings->add($setting);
+
     $name = 'auth_onelogin_saml/saml_auto_create_users';
     $title = get_string('auth_onelogin_saml_auto_create_users', 'auth_onelogin_saml');
     $description = get_string('auth_onelogin_saml_auto_create_users_description', 'auth_onelogin_saml');
@@ -127,7 +142,7 @@ if ($ADMIN->fulltree) {
     $help .= get_string('auth_fieldlock_expl', 'auth');
     $custom_user_profile_fields = $authplugin->get_custom_user_profile_fields();
     display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields, $help, true, false, $custom_user_profile_fields);
-     
+
     //add username mapping separately (doesn't appear in $authplugin->userfiedls)
     $name = 'auth_onelogin_saml/field_map_username';
     $title = get_string('auth_onelogin_saml_username_map', 'auth_onelogin_saml');
