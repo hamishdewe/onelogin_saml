@@ -195,9 +195,12 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
         	*/
         }
 
-        foreach ($authsenabled as $hau) {
-            $hauth = get_auth_plugin($hau);
-            $hauth->user_authenticated_hook($user, $user_saml[$saml_account_matcher], $password);
+        // Try other methods if enabled
+        if (auth_onelogin_saml_get_settings()->override_auth) {
+          foreach ($authsenabled as $hau) {
+              $hauth = get_auth_plugin($hau);
+              $hauth->user_authenticated_hook($user, $user_saml[$saml_account_matcher], $password);
+          }
         }
         if (!$user->id && !$saml_create) {
             print_error(get_string('error_idpusernotexists', 'auth_onelogin_saml', $a));

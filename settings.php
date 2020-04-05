@@ -101,7 +101,13 @@ if ($ADMIN->fulltree) {
     $description = get_string('auth_onelogin_saml_idp_button_description', 'auth_onelogin_saml');
     $default = get_string('auth_onelogin_saml_idp_button_default', 'auth_onelogin_saml');
     $setting = new admin_setting_configtext($name, $title, $description, $default, PARAM_TEXT);
+    $settings->add($setting);
 
+    $name = 'auth_onelogin_saml/override_auth';
+    $title = get_string('auth_onelogin_saml_override_auth', 'auth_onelogin_saml');
+    $description = get_string('auth_onelogin_saml_override_auth_description', 'auth_onelogin_saml');
+    $default = true;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
     $settings->add($setting);
 
     $name = 'auth_onelogin_saml/saml_auto_create_users';
