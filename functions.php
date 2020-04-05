@@ -121,11 +121,16 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
     $a->wwwroot = $CFG->wwwroot;
     $a->user_saml = $user_saml[$saml_account_matcher];
     $a->username = $user_saml["username"];
+    $pluginconfig = get_config('auth_onelogin_saml');
 
     if ($user = get_complete_user_data($saml_account_matcher, $user_saml[$saml_account_matcher])) {
         $auth = empty($user->auth) ? 'manual' : $user->auth;  // use manual if auth not set
         if ($auth=='nologin' or !is_enabled_auth($auth)) {
             print_error(get_string('error_disabledlogin', 'auth_onelogin_saml', $a));
+            return false;
+        }
+        if (!$pluginconfig->override_auth && $user->auth !== 'onelogin_saml') {
+            print_error(get_string('error_methodnotallowed', 'auth_onelogin_saml', $a));
             return false;
         }
     } else {
@@ -195,12 +200,9 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
         	*/
         }
 
-        // Try other methods if enabled
-        if (auth_onelogin_saml_get_settings()->override_auth) {
-          foreach ($authsenabled as $hau) {
-              $hauth = get_auth_plugin($hau);
-              $hauth->user_authenticated_hook($user, $user_saml[$saml_account_matcher], $password);
-          }
+        foreach ($authsenabled as $hau) {
+            $hauth = get_auth_plugin($hau);
+            $hauth->user_authenticated_hook($user, $user_saml[$saml_account_matcher], $password);
         }
         if (!$user->id && !$saml_create) {
             print_error(get_string('error_idpusernotexists', 'auth_onelogin_saml', $a));

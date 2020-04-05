@@ -123,6 +123,7 @@ $string['notification_unmappedroles'] = 'Notice that there are roles without map
 
 // Errors in functions.php, index.php
 $string['error_disabledlogin'] = '[client {$a->remoteaddr}] {$a->wwwroot}  --->  DISABLED LOGIN: {$a->user_saml}';
+$string['error_methodnotallowed'] = 'The account {$a->user_saml} does not use the OneLogin authentication method';
 $string['error_deletedlogin'] = '[client {$a->remoteaddr}] {$a->wwwroot}  --->  DELETED LOGIN: {$a->user_saml}';
 $string['error_failedlogin'] = '[client {$a->remoteaddr}] {$a->wwwroot}  --->  FAILED LOGIN: {$a->username}';
 $string['error_usernamerequired'] = 'Username is required in order to create the account';
