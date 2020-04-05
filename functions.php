@@ -12,21 +12,21 @@
  * @requires php-saml v3.3.1
  * @copyright 2011-2019 OneLogin.com
  *
- * @description 
+ * @description
  * Connects to Moodle, builds the configuration, discovers SAML status, and handles the login process accordingly.
  *
- * Security Assertion Markup Language (SAML) is a standard for logging users into applications based 
- * on their session in another context. This has significant advantages over logging in using a 
- * username/password: no need to type in credentials, no need to remember and renew password, no weak 
+ * Security Assertion Markup Language (SAML) is a standard for logging users into applications based
+ * on their session in another context. This has significant advantages over logging in using a
+ * username/password: no need to type in credentials, no need to remember and renew password, no weak
  * passwords etc.
  *
- * Most companies already know the identity of users because they are logged into their Active Directory 
- * domain or intranet. It is natural to use this information to log users into other applications as well 
+ * Most companies already know the identity of users because they are logged into their Active Directory
+ * domain or intranet. It is natural to use this information to log users into other applications as well
  * such as web-based application, and one of the more elegant ways of doing this by using SAML.
  *
- * SAML is very powerful and flexible, but the specification can be quite a handful. Now OneLogin is 
- * releasing this SAML toolkit for your Moodle application to enable you to integrate SAML in seconds 
- * instead of months. We’ve filtered the signal from the noise and come up with a simple setup that will 
+ * SAML is very powerful and flexible, but the specification can be quite a handful. Now OneLogin is
+ * releasing this SAML toolkit for your Moodle application to enable you to integrate SAML in seconds
+ * instead of months. We’ve filtered the signal from the noise and come up with a simple setup that will
  * work for most applications out there.
  *
  */
@@ -116,13 +116,16 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
     $authsenabled = get_enabled_auth_plugins();
     $password = getRandomPassword();
     $created = false;
+    $a = new stdClass();
+    $a->remoteaddr = getremoteaddr();
+    $a->wwwroot = $CFG->wwwroot;
+    $a->user_saml = $user_saml[$saml_account_matcher];
+    $a->username = $user_saml["username"];
 
     if ($user = get_complete_user_data($saml_account_matcher, $user_saml[$saml_account_matcher])) {
         $auth = empty($user->auth) ? 'manual' : $user->auth;  // use manual if auth not set
         if ($auth=='nologin' or !is_enabled_auth($auth)) {
-            $error_msg = '[client '.getremoteaddr().'] '.$CFG->wwwroot.'  --->  DISABLED LOGIN: '.$user_saml[$saml_account_matcher];
-            //error_log($error_msg);
-            print_error($error_msg);
+            print_error(get_string('error_disabledlogin', 'auth_onelogin_saml', $a));
             return false;
         }
     } else {
@@ -131,9 +134,8 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
         $query_conditions[$saml_account_matcher] = $user_saml[$saml_account_matcher];
         $query_conditions['deleted'] = 1;
         if ($DB->get_field('user', 'id', $query_conditions)) {
-            $error_msg = '[client '.$_SERVER['REMOTE_ADDR'].'] '.  $CFG->wwwroot.'  --->  DELETED LOGIN: '.$user_saml[$saml_account_matcher];
-            //error_log($error_msg);
-            print_error($error_msg);
+            $a->remoteaddr = $_SERVER['REMOTE_ADDR'];
+            print_error(get_string('error_deletedlogin', 'auth_onelogin_saml', $a));
             return false;
         }
 
@@ -156,7 +158,7 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
             // if user not found, create him
             if ($saml_create) {
                 if (!isset($user_saml['username']) || empty($user_saml['username'])) {
-                    print_error("Username is required in order to create the account");
+                    print_error(get_string('error_usernamerequired', 'auth_onelogin_saml'));
                     return false;
                 }
                 $user = create_user_record($user_saml['username'], $password, $auth);
@@ -186,7 +188,7 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
             // update user record from external DB
             /*
 
-            if (!$authplugin->is_internal()) { 
+            if (!$authplugin->is_internal()) {
                 $user = update_user_record($user->username, get_auth_plugin($user->auth));
             }
 
@@ -198,7 +200,7 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
             $hauth->user_authenticated_hook($user, $user_saml[$saml_account_matcher], $password);
         }
         if (!$user->id && !$saml_create) {
-            print_error("User provided by the IdP". ' "'. $user_saml[$saml_account_matcher] . '" '. "not exists in moodle and auto-provisioning is disabled");
+            print_error(get_string('error_idpusernotexists', 'auth_onelogin_saml', $a));
             return false;
         }
         return $user;
@@ -206,7 +208,7 @@ function auth_onelogin_saml_authenticate_user_login($saml_account_matcher, $user
 
     // failed if all the plugins have failed
     error_log("SAML Error. index.php -- FAILED LOGIN". $user_saml["username"]);
-    print_error('[client '.getremoteaddr()."]  $CFG->wwwroot  --->  FAILED LOGIN: ".$user_saml["username"]);
+    print_error(get_string('error_failedlogin', 'auth_onelogin_saml', $a));
     return false;
 }
 

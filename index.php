@@ -12,21 +12,21 @@
  * @requires php-saml v3.3.1
  * @copyright 2011-2019 OneLogin.com
  *
- * @description 
+ * @description
  * Connects to Moodle, builds the configuration, discovers SAML status, and handles the login process accordingly.
  *
- * Security Assertion Markup Language (SAML) is a standard for logging users into applications based 
- * on their session in another context. This has significant advantages over logging in using a 
- * username/password: no need to type in credentials, no need to remember and renew password, no weak 
+ * Security Assertion Markup Language (SAML) is a standard for logging users into applications based
+ * on their session in another context. This has significant advantages over logging in using a
+ * username/password: no need to type in credentials, no need to remember and renew password, no weak
  * passwords etc.
  *
- * Most companies already know the identity of users because they are logged into their Active Directory 
- * domain or intranet. It is natural to use this information to log users into other applications as well 
+ * Most companies already know the identity of users because they are logged into their Active Directory
+ * domain or intranet. It is natural to use this information to log users into other applications as well
  * such as web-based application, and one of the more elegant ways of doing this by using SAML.
  *
- * SAML is very powerful and flexible, but the specification can be quite a handful. Now OneLogin is 
- * releasing this SAML toolkit for your Moodle application to enable you to integrate SAML in seconds 
- * instead of months. We’ve filtered the signal from the noise and come up with a simple setup that will 
+ * SAML is very powerful and flexible, but the specification can be quite a handful. Now OneLogin is
+ * releasing this SAML toolkit for your Moodle application to enable you to integrate SAML in seconds
+ * instead of months. We’ve filtered the signal from the noise and come up with a simple setup that will
  * work for most applications out there.
  *
  */
@@ -78,7 +78,7 @@ if (isset($_GET['wantsurl'])) {
     $wantsurl = $SESSION->wantsurl = clean_param($_GET['wantsurl'], PARAM_URL);
 }
 
-// check for a wantsurl in the existing Moodle session 
+// check for a wantsurl in the existing Moodle session
 if (empty($wantsurl) && isset($SESSION->wantsurl)) {
     $wantsurl = $SESSION->wantsurl;
 }
@@ -180,7 +180,7 @@ if ($logoutActived) {
         }
     } else {
         // You shouldn't be able to reach here.
-        $errorMsg = "auth_onelogin_saml: Module Setup Error: Review the OneLogin setup instructions for the SAML authentication module";
+        $errorMsg = get_string('error_setup', 'auth_onelogin_saml');
     }
 
     if (!isset($errorMsg)) {
@@ -226,13 +226,14 @@ if ($logoutActived) {
                     unset($SESSION->wantsurl);
                     redirect($urltogo, 0);
                 } else {
-                    $errorMsg = "auth_onelogin_saml: You could not be identified or created: ".htmlspecialchars((!empty($saml_user['username']) ? $saml_user['username'] : $saml_user['email']));
+                    $a = htmlspecialchars((!empty($saml_user['username']) ? $saml_user['username'] : $saml_user['email']));
+                    $errorMsg = get_string('error_usernotidentified', 'auth_onelogin_saml');
                 }
             } else {
-                $errorMsg = "auth_onelogin_saml: No SAML response detected.";
+                $errorMsg = get_string('error_nosamlresponse', 'auth_onelogin_saml');
             }
         } else {
-            $errorMsg = 'auth_onelogin_saml: auth failed due to missing username/email saml attribute: '.$pluginconfig->saml_username_map."<br />".get_string("auth_onelogin_saml_username_email_error", "auth_onelogin_saml");
+            $errorMsg = get_string('error_missingusernameemail', 'auth_onelogin_saml', $pluginconfig->saml_username_map)."<br />".get_string("auth_onelogin_saml_username_email_error", "auth_onelogin_saml");
         }
 
         if (isset($errorMsg)) {

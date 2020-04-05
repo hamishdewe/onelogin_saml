@@ -97,3 +97,35 @@ $string['pluginauthfailedusername'] = 'The OneLogin SAML authentication plugin f
 $string['auth_onelogin_saml_username_email_error'] = 'The identity provider returned a set of data that does not contain the SAML username/email mapping field. Once of this field is required to login. <br />Please check your Username/Email Address Attribute Mapping configuration.';
 
 $string['pluginname'] = 'OneLogin SAML SSO Authentication';
+
+// Notifications in auth.php
+$string['notification_debugmode_on'] = 'Debug mode <strong>on</strong>. In production turn it off';
+$string['notification_debugmode_off'] = '<strong>off</strong>';
+$string['notification_strictmode_on'] = 'Strict mode <strong>on</strong>';
+$string['notification_strictmode_off'] = 'Strict mode <strong>off</strong>. In production we recommend to turn it on.';
+$string['notification_samlsettings_valid'] = 'SAML settings are <strong>ok</strong>';
+$string['notification_samlsettings_invalid'] = 'Found errors while validating SAML settings info.<br>{$a}';
+$string['notification_slo_enabled'] = 'Single Log Out is enabled. If the SLO process fail, close your browser to be sure that session of the apps are closed';
+$string['notification_slo_disabled'] = 'Single Log Out is disabled. If you log out from Moodle your session at the IdP keeps alive.';
+$string['notification_keyonfilesystem'] = 'There is a private key stored at the filesystem. Protect the \'certs\' path. Nobody should be allowed to access:<br>{$a}<br>';
+$string['notification_keyindatabase'] = 'There is a private key stored at the database. (An attacker could own your database and get it. Take care)';
+$string['notification_dbkeypriority'] = 'Private key/certs stored on database have priority over the private key/cert stored at filesystem';
+$string['notification_userautocreate_on'] = 'User will be created if not exists, based on the data sent by the IdP.';
+$string['notification_userautocreate_off'] = 'If the user not exists, access is prevented.';
+$string['notification_userupdate'] = 'User account will be updated with the data sent by the IdP.';
+$string['notification_attributemapping'] = 'Is important to set the attribute and the role mapping when auto-provisioning or account update are active.';
+$string['notificaton_usernamemappingrequired'] = 'Username mapping is required in order to enable the SAML Single Sign On';
+$string['notification_emailmappingrequired'] = 'Email Address mapping is required in order to enable the SAML Single Sign On';
+$string['notification_unmappedattributes'] = 'Notice that there are attributes without mapping:<br>{$a}';
+$string['notification_unmappedroles'] = 'Notice that there are roles without mapping:<br>{$a}';
+
+// Errors in functions.php, index.php
+$string['error_disabledlogin'] = '[client {$a->remoteaddr}] {$a->wwwroot}  --->  DISABLED LOGIN: {$a->user_saml}';
+$string['error_deletedlogin'] = '[client {$a->remoteaddr}] {$a->wwwroot}  --->  DELETED LOGIN: {$a->user_saml}';
+$string['error_failedlogin'] = '[client {$a->remoteaddr}] {$a->wwwroot}  --->  FAILED LOGIN: {$a->username}';
+$string['error_usernamerequired'] = 'Username is required in order to create the account';
+$string['error_idpusernotexists'] = 'User provided by the IdP "{$a->user_saml}" not exists in moodle and auto-provisioning is disabled';
+$string['error_setup'] = 'auth_onelogin_saml: Module Setup Error: Review the OneLogin setup instructions for the SAML authentication module';
+$string['error_usernotidentified'] = 'auth_onelogin_saml: You could not be identified or created: {$a}';
+$string['error_nosamlresponse'] = 'auth_onelogin_saml: No SAML response detected.';
+$string['error_missingusernameemail'] = 'auth_onelogin_saml: auth failed due to missing username/email saml attribute: {$a}';

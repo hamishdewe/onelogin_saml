@@ -311,53 +311,53 @@ class auth_plugin_onelogin_saml extends auth_plugin_base {
 
         $settings = auth_onelogin_saml_get_settings();
 
-        echo $OUTPUT->notification('Debug mode '. ($settings['debug']?'<strong>on</strong>. '."In production turn it off":'<strong>off</strong>'), 'userinfobox notifysuccess');
-        echo $OUTPUT->notification('Strict mode '. ($settings['strict']?'<strong>on</strong>':'<strong>off</strong>. '."In production we recommend to turn it on."), 'userinfobox notifysuccess');
+        echo $OUTPUT->notification($settings['debug'] ? get_string('notification_debugmode_on', 'auth_onelogin_saml') : get_string('notification_debugmode_off', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
+        echo $OUTPUT->notification($settings['strict'] ? get_string('notification_strictmode_on', 'auth_onelogin_saml') : get_string('notification_srictmode_off', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
 
         $spPrivatekey = $settings['sp']['x509cert'];
         $spCert = $settings['sp']['privateKey'];
 
         try {
             $samlSettings = new Settings($settings);
-            echo $OUTPUT->notification('SAML settings are <strong>ok</strong>', 'userinfobox notifysuccess');
+            echo $OUTPUT->notification(get_string('notification_samlsettings_valid', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
         } catch (\Exception $e) {
-            echo $OUTPUT->notification('Found errors while validating SAML settings info.<br>'.$e->getMessage(), 'userinfobox notifyproblem');
+            echo $OUTPUT->notification(get_string('notification_samlsettings_valid', 'auth_onelogin_saml', $e->getMessage()), 'userinfobox notifyproblem');
         }
 
         if ($pluginconfig->saml_slo) {
-            echo $OUTPUT->notification("Single Log Out is enabled. If the SLO process fail, close your browser to be sure that session of the apps are closed.", 'userinfobox notifysuccess');
+            echo $OUTPUT->notification(get_string('notification_slo_enabled', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
         } else {
-            echo $OUTPUT->notification("Single Log Out is disabled. If you log out from Moodle your session at the IdP keeps alive.", 'userinfobox notifysuccess');
+            echo $OUTPUT->notification(get_string('notification_slo_disabled', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
         }
 
         $fileSystemKeyExists = file_exists($CFG->dirroot.'/auth/onelogin_saml/certs/sp.key');
         $fileSystemCertExists = file_exists($CFG->dirroot.'/auth/onelogin_saml/certs/sp.crt');
         if ($fileSystemKeyExists) {
             $privatekey_url = $CFG->wwwroot . '/auth/onelogin_saml/certs/sp.key';
-            echo $OUTPUT->notification("There is a private key stored at the filesystem. Protect the 'certs' path. Nobody should be allowed to access:".'<br>'.$privatekey_url.'<br>', 'userinfobox');
+            echo $OUTPUT->notification(get_string('notification_keyonfilesystem', 'auth_onelogin_saml', $privatekey_url), 'userinfobox');
         }
 
         if ($spPrivatekey && !empty($spPrivatekey)) {
-            echo $OUTPUT->notification("There is a private key stored at the database. (An attacker could own your database and get it. Take care)", 'userinfobox');
+            echo $OUTPUT->notification(get_string('notification_keyindatabase', 'auth_onelogin_saml'), 'userinfobox');
         }
 
         if (($spPrivatekey && !empty($spPrivatekey) && $fileSystemKeyExists) ||
             ($spCert && !empty($spCert) && $fileSystemCertExists)) {
-            echo $OUTPUT->notification("Private key/certs stored on database have priority over the private key/cert stored at filesystem", 'userinfobox');
+            echo $OUTPUT->notification(get_string('notification_dbkeypriority', 'auth_onelogin_saml'), 'userinfobox');
         }
 
         if ($pluginconfig->saml_auto_create_users) {
-            echo $OUTPUT->notification("User will be created if not exists, based on the data sent by the IdP.", 'userinfobox notifysuccess');
+            echo $OUTPUT->notification(get_string('notification_userautocreate_on', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
         } else {
-            echo $OUTPUT->notification("If the user not exists, access is prevented.", 'userinfobox notifysuccess');
+            echo $OUTPUT->notification(get_string('notification_userautocreate_off', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
         }
 
         if ($pluginconfig->saml_auto_update_users) {
-            echo $OUTPUT->notification("User account will be updated with the data sent by the IdP.", 'userinfobox notifysuccess');
+            echo $OUTPUT->notification(get_string('notification_userupdate', 'auth_onelogin_saml'), 'userinfobox notifysuccess');
         }
 
         if ($pluginconfig->saml_auto_create_users || $pluginconfig->saml_auto_update_users) {
-            echo $OUTPUT->notification("Is important to set the attribute and the role mapping when auto-provisioning or account update are active.", 'userinfobox');
+            echo $OUTPUT->notification(get_string('notification_attributemapping', 'auth_onelogin_saml'), 'userinfobox');
         }
 
         $attr_mappings = array (
@@ -379,17 +379,17 @@ class auth_plugin_onelogin_saml extends auth_plugin_base {
             $value = $pluginconfig->{"$field"};
             if (empty($value)) {
                 if ($saml_account_matcher == 'username' && $field == 'field_map_username') {
-                    echo $OUTPUT->notification("Username mapping is required in order to enable the SAML Single Sign On", 'userinfobox notifyproblem');
+                    echo $OUTPUT->notification(get_string("notification_usernamemappingrequired", "auth_onelogin_saml"), 'userinfobox notifyproblem');
                 }
                 if ($saml_account_matcher == 'email' && $field == 'field_map_email') {
-                    echo $OUTPUT->notification("Email Address mapping is required in order to enable the SAML Single Sign On", 'userinfobox notifyproblem');
+                    echo $OUTPUT->notification(get_string("notification_emailmappingrequired", "auth_onelogin_saml"), 'userinfobox notifyproblem');
                 }
                 $lacked_attr_mappings[] = $name;
             }
         }
 
         if (!empty($lacked_attr_mappings)) {
-            echo $OUTPUT->notification("Notice that there are attributes without mapping:<br>".implode('<br>', $lacked_attr_mappings), 'userinfobox');
+            echo $OUTPUT->notification(get_string("notification_unmappedattributes", "auth_onelogin_saml", implode('<br>', $lacked_attr_mappings)), 'userinfobox');
         }
 
         $role_mappings = array (
@@ -407,7 +407,7 @@ class auth_plugin_onelogin_saml extends auth_plugin_base {
         }
 
         if (!empty($lacked_role_mappings)) {
-            echo $OUTPUT->notification("Notice that there are roles without mapping:<br>".implode('<br>', $lacked_role_mappings), 'userinfobox');
+            echo $OUTPUT->notification(get_string("notification_unmappedattributes", "auth_onelogin_saml", implode('<br>', $lacked_role_mappings)), 'userinfobox');
         }
     }
 }
