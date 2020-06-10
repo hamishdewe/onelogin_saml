@@ -410,4 +410,29 @@ class auth_plugin_onelogin_saml extends auth_plugin_base {
             echo $OUTPUT->notification(get_string("notification_unmappedattributes", "auth_onelogin_saml", implode('<br>', $lacked_role_mappings)), 'userinfobox');
         }
     }
+
+    /**
+     * Confirm the new user as registered. This should normally not be used,
+     * but it may be necessary if the user auth_method is changed to manual
+     * before the user is confirmed.
+     *
+     * @param string $username
+     * @param string $confirmsecret
+     */
+     function user_confirm($username, $confirmsecret = null) {
+         global $DB;
+
+         $user = get_complete_user_data('username', $username);
+
+         if (!empty($user)) {
+             if ($user->confirmed) {
+                 return AUTH_CONFIRM_ALREADY;
+             } else {
+                 $DB->set_field("user", "confirmed", 1, array("id"=>$user->id));
+                 return AUTH_CONFIRM_OK;
+             }
+         } else  {
+             return AUTH_CONFIRM_ERROR;
+         }
+     }
 }
